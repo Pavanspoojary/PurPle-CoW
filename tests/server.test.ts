@@ -34,14 +34,14 @@ describe('Dead Link Insurance HTTP Server API', () => {
     expect(p0.remediation_diff).toContain('+ ');
   });
 
-  it('serves / (index.html dashboard)', async () => {
+  it('serves / (index.html landing page)', async () => {
     const req = new Request('http://localhost/');
     const res = await appHandler(req);
     expect(res.status).toBe(200);
     const html = await res.text();
     expect(html).toContain('Dead Link Insurance');
-    expect(html).toContain('$29/mo Flat Plan');
-    expect(html).toContain('Monthly Link Cap');
+    expect(html).toContain('$29');
+    expect(html).toContain('Blast Radius');
   });
 
   it('handles /api/topup to increase cap by 1,000 links', async () => {
