@@ -693,7 +693,18 @@
 
     <div class="nav-actions">
       <a href="https://github.com/Pavanspoojary/PurPle-CoW" target="_blank" class="btn btn-secondary btn-sm">GitHub</a>
-      <a href="#live-console" class="btn btn-accent btn-sm">Open Live Demo</a>
+      
+      <!-- Clerk Signed Out State -->
+      <div id="clerk-signed-out" style="display: flex; gap: 8px;">
+        <button class="btn btn-secondary btn-sm" onclick="window.Clerk?.openSignIn()">Sign In</button>
+        <button class="btn btn-accent btn-sm" onclick="window.Clerk?.openSignUp()">Sign Up</button>
+      </div>
+
+      <!-- Clerk Signed In State -->
+      <div id="clerk-signed-in" style="display: none; align-items: center; gap: 10px;">
+        <span id="clerk-user-name" style="font-size: 0.82rem; font-weight: 600; color: var(--text);"></span>
+        <div id="clerk-user-button"></div>
+      </div>
     </div>
   </header>
 
@@ -1023,6 +1034,48 @@
   </footer>
 
   <script>
+    // Clerk Authentication Integration
+    async function setupClerk() {
+      try {
+        const res = await fetch('/api/clerk-config');
+        const data = await res.json();
+        const pk = data.publishableKey;
+        if (!pk) return;
+
+        const script = document.createElement('script');
+        script.setAttribute('data-clerk-publishable-key', pk);
+        script.async = true;
+        script.src = 'https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js';
+        script.crossOrigin = 'anonymous';
+
+        script.onload = async () => {
+          const clerk = window.Clerk;
+          await clerk.load();
+
+          const signedOut = document.getElementById('clerk-signed-out');
+          const signedIn = document.getElementById('clerk-signed-in');
+          const userBtn = document.getElementById('clerk-user-button');
+          const userName = document.getElementById('clerk-user-name');
+
+          if (clerk.user) {
+            if (signedOut) signedOut.style.display = 'none';
+            if (signedIn) signedIn.style.display = 'flex';
+            if (userName) userName.textContent = clerk.user.firstName || clerk.user.primaryEmailAddress?.emailAddress || 'Signed In';
+            if (userBtn) clerk.mountUserButton(userBtn);
+          } else {
+            if (signedOut) signedOut.style.display = 'flex';
+            if (signedIn) signedIn.style.display = 'none';
+          }
+        };
+
+        document.body.appendChild(script);
+      } catch (e) {
+        console.warn('Clerk auth initialization skipped:', e);
+      }
+    }
+
+    setupClerk();
+
     async function runLiveScan(btn) {
       btn.textContent = 'Scanning...';
       try {

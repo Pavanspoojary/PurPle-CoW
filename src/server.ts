@@ -4,6 +4,12 @@ import { store } from './lib/store';
 import { ScannerPipeline } from './engine/scanner';
 import { UsageMeter } from './engine/usage-meter';
 
+import * as dotenv from 'dotenv';
+
+// Load both .env and .env.local
+dotenv.config({ path: resolve(process.cwd(), '.env') });
+dotenv.config({ path: resolve(process.cwd(), '.env.local') });
+
 const PORT = Number(process.env.PORT) || 3000;
 const PUBLIC_DIR = resolve(import.meta.dir, 'public');
 
@@ -91,7 +97,16 @@ export async function appHandler(req: Request): Promise<Response> {
     );
   }
 
-  // 5. Serve Static Frontend
+  // 5. API: Clerk Config
+  if (url.pathname === '/api/clerk-config' && req.method === 'GET') {
+    const publishableKey =
+      process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ||
+      process.env.CLERK_PUBLISHABLE_KEY ||
+      '';
+    return new Response(JSON.stringify({ publishableKey }), { headers });
+  }
+
+  // 6. Serve Static Frontend
   if (url.pathname === '/' || url.pathname === '/index.html') {
     const indexPath = join(PUBLIC_DIR, 'index.html');
     if (existsSync(indexPath)) {
