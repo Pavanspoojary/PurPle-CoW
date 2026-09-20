@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 import { resolve } from 'path';
-import { ScannerPipeline } from './engine/scanner.ts';
+import { ScannerPipeline } from './engine/scanner';
 
 // ANSI terminal colors without external heavy packages
 const reset = '\x1b[0m';

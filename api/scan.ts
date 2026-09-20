@@ -1,5 +1,5 @@
 import { resolve } from 'path';
-import { ScannerPipeline } from '../src/engine/scanner.ts';
+import { ScannerPipeline } from '../src/engine/scanner';
 
 export default async function handler(req: any, res: any) {
   res.setHeader('Content-Type', 'application/json');

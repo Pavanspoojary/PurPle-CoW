@@ -1,8 +1,8 @@
 import { readFileSync, existsSync } from 'fs';
 import { resolve, join } from 'path';
-import { store } from './lib/store.ts';
-import { ScannerPipeline } from './engine/scanner.ts';
-import { UsageMeter } from './engine/usage-meter.ts';
+import { store } from './lib/store';
+import { ScannerPipeline } from './engine/scanner';
+import { UsageMeter } from './engine/usage-meter';
 
 const PORT = Number(process.env.PORT) || 3000;
 const PUBLIC_DIR = resolve(import.meta.dir, 'public');

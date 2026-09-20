@@ -1,4 +1,4 @@
-import { store } from '../lib/store.ts';
+import { store } from '../lib/store';
 
 export interface PlanStatus {
   planName: string;

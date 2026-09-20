@@ -1,5 +1,5 @@
-import { store } from '../src/lib/store.ts';
-import { UsageMeter } from '../src/engine/usage-meter.ts';
+import { store } from '../src/lib/store';
+import { UsageMeter } from '../src/engine/usage-meter';
 
 export default async function handler(req: any, res: any) {
   res.setHeader('Content-Type', 'application/json');

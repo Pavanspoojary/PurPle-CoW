@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'bun:test';
 import { resolve } from 'path';
-import { AstParser } from '../src/engine/ast-parser.ts';
-import { BlastRadiusEngine } from '../src/engine/blast-radius.ts';
-import { RemediationEngine } from '../src/engine/remediation.ts';
-import { UsageMeter } from '../src/engine/usage-meter.ts';
-import { ScannerPipeline } from '../src/engine/scanner.ts';
+import { AstParser } from '../src/engine/ast-parser';
+import { BlastRadiusEngine } from '../src/engine/blast-radius';
+import { RemediationEngine } from '../src/engine/remediation';
+import { UsageMeter } from '../src/engine/usage-meter';
+import { ScannerPipeline } from '../src/engine/scanner';
 
 describe('Dead Link Insurance Core Engines', () => {
 

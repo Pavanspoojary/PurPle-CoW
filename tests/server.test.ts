@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'bun:test';
-import { appHandler } from '../src/server.ts';
+import { appHandler } from '../src/server';
 
 describe('Dead Link Insurance HTTP Server API', () => {
   it('serves /api/status with One Plan + Usage Cap metrics', async () => {

@@ -1,11 +1,11 @@
 import { readdirSync, statSync } from 'fs';
 import { join, extname } from 'path';
-import { AstParser, ParsedFile } from './ast-parser.ts';
-import { BlastRadiusEngine, ScoredBlastRadius } from './blast-radius.ts';
-import { crawler, CrawlResult } from './crawler.ts';
-import { RemediationEngine, RemediationResult } from './remediation.ts';
-import { UsageMeter } from './usage-meter.ts';
-import { store } from '../lib/store.ts';
+import { AstParser, ParsedFile } from './ast-parser';
+import { BlastRadiusEngine, ScoredBlastRadius } from './blast-radius';
+import { crawler, CrawlResult } from './crawler';
+import { RemediationEngine, RemediationResult } from './remediation';
+import { UsageMeter } from './usage-meter';
+import { store } from '../lib/store';
 
 export interface ScanOptions {
   rootDir: string;

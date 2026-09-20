@@ -1,4 +1,4 @@
-import { ParsedFile, ExtractedLink } from './ast-parser.ts';
+import { ParsedFile, ExtractedLink } from './ast-parser';
 
 export interface RouteImpact {
   routePath: string;

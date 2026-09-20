@@ -7,7 +7,7 @@ import {
   MonitoredPageRecord,
   IncidentRecord,
   UsageTrackingRecord,
-} from './supabase.ts';
+} from './supabase';
 
 // High-speed local store with Supabase dual-sync
 class Store {
