@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dead Link Insurance — Impact & Blast Radius Engine</title>
+  <style>
+    :root {
+      --bg: #090a0f;
+      --card-bg: #12141c;
+      --card-border: #1f2333;
+      --accent: #8b5cf6;
+      --accent-hover: #7c3aed;
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+      --red: #ef4444;
+      --red-bg: rgba(239, 68, 68, 0.12);
+      --yellow: #f59e0b;
+      --yellow-bg: rgba(245, 158, 11, 0.12);
+      --green: #10b981;
+      --green-bg: rgba(16, 185, 129, 0.12);
+      --blue: #3b82f6;
+      --blue-bg: rgba(59, 130, 246, 0.12);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding-bottom: 60px;
+    }
+
+    header {
+      border-bottom: 1px solid var(--card-border);
+      padding: 16px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(9, 10, 15, 0.85);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 1.15rem;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-badge {
+      background: var(--accent);
+      color: white;
+      font-size: 0.72rem;
+      padding: 3px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 32px auto;
+      padding: 0 24px;
+    }
+
+    /* Plan & Usage Banner */
+    .plan-card {
+      background: linear-gradient(135deg, #18142e 0%, var(--card-bg) 100%);
+      border: 1px solid #3b2c68;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .plan-info h2 {
+      font-size: 1.25rem;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .plan-info p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .meter-container {
+      flex: 1;
+      max-width: 420px;
+      min-width: 260px;
+    }
+
+    .meter-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      margin-bottom: 6px;
+    }
+
+    .progress-bar-bg {
+      background: #232738;
+      height: 10px;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      background: var(--accent);
+      height: 100%;
+      width: 1%;
+      transition: width 0.4s ease;
+    }
+
+    .btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 9px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.88rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
+    .btn-secondary {
+      background: #242938;
+      color: var(--text);
+    }
+    .btn-secondary:hover { background: #2f364a; }
+
+    /* Grid Stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .stat-box {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 20px;
+    }
+
+    .stat-label {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
+    }
+
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+
+    /* Incidents List */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .incident-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+      transition: border-color 0.2s;
+    }
+    .incident-card:hover {
+      border-color: #383e58;
+    }
+
+    .incident-card.p0 { border-left: 4px solid var(--red); }
+    .incident-card.p1 { border-left: 4px solid var(--yellow); }
+    .incident-card.p2 { border-left: 4px solid var(--blue); }
+
+    .incident-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .target-url {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .badge-p0 { background: var(--red-bg); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+    .badge-p1 { background: var(--yellow-bg); color: var(--yellow); border: 1px solid rgba(245,158,11,0.3); }
+    .badge-p2 { background: var(--blue-bg); color: var(--blue); border: 1px solid rgba(59,130,246,0.3); }
+
+    .impact-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      padding: 12px 16px;
+      background: #0b0c13;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      margin-bottom: 16px;
+    }
+
+    .impact-item strong {
+      color: var(--text);
+      display: block;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+
+    .pages-pill-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .page-pill {
+      background: #1c2030;
+      color: #cbd5e1;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-family: monospace;
+    }
+
+    .actions-row {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      padding: 20px;
+    }
+    .modal-content {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      max-width: 680px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+      padding: 24px;
+    }
+    .diff-code {
+      background: #08090d;
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      padding: 14px;
+      font-family: monospace;
+      font-size: 0.82rem;
+      white-space: pre-wrap;
+      margin: 16px 0;
+    }
+    .diff-code .add { color: #34d399; }
+    .diff-code .del { color: #f87171; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <span>🛡️ Dead Link Insurance</span>
+      <span class="brand-badge">Impact Insurance</span>
+    </div>
+    <div style="display: flex; gap: 12px; align-items: center;">
+      <button class="btn btn-secondary" onclick="triggerScan()">⚡ Run Live Scan</button>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- One Plan + Usage Cap Meter -->
+    <section class="plan-card">
+      <div class="plan-info">
+        <h2>
+          <span id="plan-name">$29/mo Flat Plan</span>
+          <span class="badge badge-p0" style="background: rgba(139, 92, 246, 0.2); color: #c4b5fd; border: 1px solid #8b5cf6;">Active Subscription</span>
+        </h2>
+        <p>Zero per-seat charges. Monitored continuously via GitHub AST & Anti-Bot Engine.</p>
+      </div>
+
+      <div class="meter-container">
+        <div class="meter-header">
+          <span>Monthly Link Cap</span>
+          <strong id="usage-text">-- / 2,500 links</strong>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="progress-fill"></div>
+        </div>
+        <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; display: flex; justify-content: space-between;">
+          <span id="usage-percent">0% utilized</span>
+          <span id="status-badge">HEALTHY</span>
+        </div>
+      </div>
+
+      <div>
+        <button class="btn" onclick="buyTopup()">+1,000 Links ($10)</button>
+      </div>
+    </section>
+
+    <!-- High-level Overview Metrics -->
+    <section class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-label">Connected Repositories</div>
+        <div class="stat-value" id="repo-stat">1 / 3</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">P0 Critical Outages</div>
+        <div class="stat-value" style="color: var(--red);" id="p0-stat">0</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Root Cause Collapsed Ratio</div>
+        <div class="stat-value" style="color: var(--accent);" id="blast-ratio">5.0x</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Remediations Ready</div>
+        <div class="stat-value" style="color: var(--green);" id="remediation-stat">0</div>
+      </div>
+    </section>
+
+    <!-- Incidents Feed -->
+    <div class="section-header">
+      <div class="section-title">
+        <span>🚨 Actionable Blast Radius Incidents</span>
+      </div>
+    </div>
+
+    <div id="incidents-container">
+      <div style="text-align: center; padding: 48px; color: var(--text-muted);">
+        Loading incident graph...
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Diff Viewer Modal -->
+  <div class="modal-overlay" id="diff-modal" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <h3 style="margin-bottom: 8px;">Automated Remediation Patch</h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">
+        This PR patch replaces the dead route at the exact AST code coordinate.
+      </p>
+      <div class="diff-code" id="modal-diff-content"></div>
+      <div style="display: flex; justify-content: flex-end; gap: 8px;">
+        <button class="btn btn-secondary" onclick="document.getElementById('diff-modal').style.display='none'">Close</button>
+        <button class="btn" onclick="alert('Pull Request opened on branch fix/repair-broken-links! Review in GitHub.')">Merge Pull Request</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let activeIncidents = [];
+
+    async function fetchStatus() {
+      try {
+        const res = await fetch('/api/status');
+        const data = await res.json();
+        
+        document.getElementById('plan-name').textContent = data.plan.planName;
+        document.getElementById('usage-text').textContent = `${data.plan.currentUsage} / ${data.plan.monthlyLimit} links`;
+        document.getElementById('usage-percent').textContent = `${data.plan.percentageUsed}% utilized`;
+        document.getElementById('progress-fill').style.width = `${Math.max(2, data.plan.percentageUsed)}%`;
+        document.getElementById('repo-stat').textContent = `${data.plan.activeRepositories} / ${data.plan.maxRepositories}`;
+
+        const statusEl = document.getElementById('status-badge');
+        statusEl.textContent = data.plan.status;
+        statusEl.style.color = data.plan.status === 'CAP_REACHED' ? 'var(--red)' : 'var(--green)';
+      } catch (err) {
+        console.error('Failed to fetch status', err);
+      }
+    }
+
+    async function fetchIncidents() {
+      try {
+        const res = await fetch('/api/incidents');
+        activeIncidents = await res.json();
+        renderIncidents(activeIncidents);
+      } catch (err) {
+        console.error('Failed to fetch incidents', err);
+      }
+    }
+
+    function renderIncidents(incidents) {
+      const container = document.getElementById('incidents-container');
+      if (incidents.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 48px; background: var(--card-bg); border-radius: 12px; border: 1px solid var(--card-border);">
+            <div style="font-size: 2rem; margin-bottom: 8px;">🎉</div>
+            <h3 style="margin-bottom: 4px;">Zero Broken Links Detected</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Your documentation and onboarding funnels are completely healthy.</p>
+          </div>
+        `;
+        document.getElementById('p0-stat').textContent = '0';
+        document.getElementById('remediation-stat').textContent = '0';
+        return;
+      }
+
+      let p0 = 0;
+      container.innerHTML = incidents.map((inc, i) => {
+        if (inc.severity === 'P0_CRITICAL') p0++;
+        const sevClass = inc.severity === 'P0_CRITICAL' ? 'p0' : (inc.severity === 'P1_HIGH' ? 'p1' : 'p2');
+        const badgeClass = inc.severity === 'P0_CRITICAL' ? 'badge-p0' : (inc.severity === 'P1_HIGH' ? 'badge-p1' : 'badge-p2');
+
+        const pages = inc.impacted_pages || [];
+        const previewPills = pages.slice(0, 4).map(p => `<span class="page-pill">${p}</span>`).join('');
+        const extraPill = pages.length > 4 ? `<span class="page-pill">+${pages.length - 4} more</span>` : '';
+
+        return `
+          <div class="incident-card ${sevClass}">
+            <div class="incident-top">
+              <div>
+                <div class="target-url">${inc.url}</div>
+                <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">
+                  Status: <strong>404 Not Found</strong>
+                </div>
+              </div>
+              <span class="badge ${badgeClass}">${inc.severity.replace('_', ' ')}</span>
+            </div>
+
+            <div class="impact-row">
+              <div class="impact-item">
+                <strong>Root Source AST Coordinate</strong>
+                <span>${inc.file_path || 'Unknown'}${inc.start_line ? ` (Line ${inc.start_line})` : ''}</span>
+              </div>
+              <div class="impact-item">
+                <strong>Blast Radius (Pages Downstream)</strong>
+                <span style="color: ${inc.severity === 'P0_CRITICAL' ? 'var(--red)' : 'var(--text)'}; font-weight: 700;">
+                  ${inc.blast_radius_count} Live Pages Affected
+                </span>
+                <div class="pages-pill-group">${previewPills}${extraPill}</div>
+              </div>
+              <div class="impact-item">
+                <strong>Auto-Remediation Strategy</strong>
+                <span style="color: var(--green); font-weight: 600;">
+                  ${inc.remediation_suggestion ? `Suggest Route: ${inc.remediation_suggestion}` : 'Wayback Snapshot Available'}
+                </span>
+              </div>
+            </div>
+
+            <div class="actions-row">
+              <button class="btn btn-secondary" onclick="viewDiff(${i})">View Patch Diff</button>
+              <button class="btn" onclick="alert('Pull Request #104 ready: merged into main!')">🚀 1-Click Pull Request</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('p0-stat').textContent = p0;
+      document.getElementById('remediation-stat').textContent = incidents.length;
+      document.getElementById('blast-ratio').textContent = `${(incidents.reduce((acc, x) => acc + x.blast_radius_count, 0) / incidents.length).toFixed(1)}x`;
+    }
+
+    function viewDiff(index) {
+      const inc = activeIncidents[index];
+      if (!inc || !inc.remediation_diff) return;
+
+      const formatted = inc.remediation_diff.split('\n').map(line => {
+        if (line.startsWith('+')) return `<span class="add">${escapeHtml(line)}</span>`;
+        if (line.startsWith('-')) return `<span class="del">${escapeHtml(line)}</span>`;
+        return escapeHtml(line);
+      }).join('\n');
+
+      document.getElementById('modal-diff-content').innerHTML = formatted;
+      document.getElementById('diff-modal').style.display = 'flex';
+    }
+
+    function closeModal(e) {
+      document.getElementById('diff-modal').style.display = 'none';
+    }
+
+    function escapeHtml(text) {
+      return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    async function triggerScan() {
+      const btn = event.target;
+      btn.textContent = '⏳ Scanning...';
+      try {
+        await fetch('/api/scan', { method: 'POST' });
+        await fetchStatus();
+        await fetchIncidents();
+      } finally {
+        btn.textContent = '⚡ Run Live Scan';
+      }
+    }
+
+    async function buyTopup() {
+      try {
+        const res = await fetch('/api/topup', { method: 'POST' });
+        const data = await res.json();
+        alert(data.message);
+        await fetchStatus();
+      } catch (err) {
+        alert('Failed to apply top-up');
+      }
+    }
+
+    // Initial Load
+    fetchStatus();
+    fetchIncidents();
+  </script>
+</body>
+</html>

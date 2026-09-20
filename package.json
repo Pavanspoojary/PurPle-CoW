@@ -1,0 +1,19 @@
+{
+  "name": "dead-link-insurance",
+  "version": "1.0.0",
+  "description": "Developer tool providing impact insurance, blast radius analysis, and auto-remediation for broken links.",
+  "main": "src/server.ts",
+  "scripts": {
+    "start": "bun run src/server.ts",
+    "dev": "bun --watch src/server.ts",
+    "scan": "bun run src/cli.ts",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.1",
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  }
+}
