@@ -1,3 +1,4 @@
+import postgres from 'postgres';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import * as dotenv from 'dotenv';
@@ -5,53 +6,33 @@ import * as dotenv from 'dotenv';
 dotenv.config({ path: resolve(process.cwd(), '.env') });
 
 const projectRef = 'kdjpsimoskqgxlvynnkz';
-const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY || '';
-const dbUrl = process.env.DATABASE_URL || '';
+const dbUrl = process.env.DATABASE_URL || process.env.SUPABASE_DB_URL || '';
+const dbPassword = process.env.SUPABASE_DB_PASSWORD || '';
 
 async function runMigration() {
   const sql = readFileSync(resolve(process.cwd(), 'supabase/schema.sql'), 'utf-8');
 
-  console.log('🔄 Attempting automated Supabase schema migration...');
-
-  if (dbUrl) {
-    console.log('📡 Connecting via direct PostgreSQL connection string (DATABASE_URL)...');
-    try {
-      // In Bun, we can use built-in or postgres client
-      console.log('Applying SQL schema...');
-      // Execute via direct psql or bun
-    } catch (e: any) {
-      console.error('Migration failed:', e.message);
-    }
-    return;
+  let connectionString = dbUrl;
+  if (!connectionString && dbPassword) {
+    connectionString = `postgresql://postgres.${projectRef}:${encodeURIComponent(dbPassword)}@aws-0-ap-south-1.pooler.supabase.com:6543/postgres`;
   }
 
-  if (serviceRoleKey) {
-    console.log('🔑 Connecting via Supabase Management API using service_role key...');
+  if (connectionString) {
+    console.log('📡 Connecting directly to Supabase PostgreSQL database...');
     try {
-      const res = await fetch(`https://api.supabase.com/v1/projects/${projectRef}/database/query`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${serviceRoleKey}`,
-        },
-        body: JSON.stringify({ query: sql }),
-      });
-
-      if (res.ok) {
-        console.log('✅ Schema successfully applied to Supabase!');
-        return;
-      }
-
-      const err = await res.text();
-      console.log('API Response:', res.status, err);
-    } catch (e: any) {
-      console.error('Failed to execute migration:', e.message);
+      const sqlClient = postgres(connectionString, { ssl: 'require' });
+      await sqlClient.unsafe(sql);
+      console.log('✅ All 7 tables, indexes, and initial usage seed applied successfully to Supabase!');
+      await sqlClient.end();
+      process.exit(0);
+    } catch (err: any) {
+      console.error('❌ PostgreSQL Migration failed:', err.message);
+      process.exit(1);
     }
-    return;
   }
 
-  console.error('❌ Missing SUPABASE_SERVICE_ROLE_KEY or DATABASE_URL in .env');
-  console.log('To allow automated execution, please add SUPABASE_SERVICE_ROLE_KEY to .env');
+  console.log('ℹ️  PostgreSQL requires a direct connection to run DDL (CREATE TABLE).');
+  console.log('👉 Provide DATABASE_URL or SUPABASE_DB_PASSWORD in .env, or paste it here to run automatically.');
 }
 
 runMigration();
