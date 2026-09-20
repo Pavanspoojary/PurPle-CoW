@@ -4,6 +4,7 @@
   "description": "Developer tool providing impact insurance, blast radius analysis, and auto-remediation for broken links.",
   "main": "src/server.ts",
   "scripts": {
+    "build": "mkdir -p public && cp src/public/index.html public/index.html 2>/dev/null || true",
     "start": "bun run src/server.ts",
     "dev": "bun --watch src/server.ts",
     "scan": "bun run src/cli.ts",

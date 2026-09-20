@@ -41,6 +41,101 @@ class Store {
       created_at: new Date().toISOString(),
     };
     this.repositories.set(repo.id, repo);
+
+    // Initial usage
+    this.usage.current_usage = 640;
+
+    // Seed targets
+    const target1: UrlTargetRecord = {
+      id: 'target-v2',
+      normalized_url: '/api/v2',
+      type: 'INTERNAL_ROUTE',
+      domain: 'internal',
+      status_code: 404,
+      is_alive: false,
+      consecutive_fails: 2,
+    };
+    this.urlTargets.set(target1.id, target1);
+
+    const target2: UrlTargetRecord = {
+      id: 'target-spec',
+      normalized_url: 'https://example-dead-domain-never-exists-987654321.org/spec',
+      type: 'EXTERNAL_URL',
+      domain: 'example-dead-domain-never-exists-987654321.org',
+      status_code: 404,
+      is_alive: false,
+      consecutive_fails: 2,
+    };
+    this.urlTargets.set(target2.id, target2);
+
+    // Seed occurrences
+    const occ1: OccurrenceRecord = {
+      id: 'occ-1',
+      repository_id: repo.id,
+      url_target_id: target1.id,
+      file_path: 'components/DocsNav.tsx',
+      start_line: 12,
+      end_line: 12,
+      is_layout: true,
+    };
+    this.occurrences.set(occ1.id, occ1);
+
+    const occ2: OccurrenceRecord = {
+      id: 'occ-2',
+      repository_id: repo.id,
+      url_target_id: target2.id,
+      file_path: 'components/DocsNav.tsx',
+      start_line: 13,
+      end_line: 13,
+      is_layout: true,
+    };
+    this.occurrences.set(occ2.id, occ2);
+
+    // Seed monitored pages
+    const p1: MonitoredPageRecord = { id: 'p1', repository_id: repo.id, route_path: '/pricing', severity: 'P0_CRITICAL' };
+    const p2: MonitoredPageRecord = { id: 'p2', repository_id: repo.id, route_path: '/docs/quickstart', severity: 'P0_CRITICAL' };
+    const p3: MonitoredPageRecord = { id: 'p3', repository_id: repo.id, route_path: '/docs/onboarding', severity: 'P0_CRITICAL' };
+    const p4: MonitoredPageRecord = { id: 'p4', repository_id: repo.id, route_path: '/docs/api-v3', severity: 'P1_HIGH' };
+    const p5: MonitoredPageRecord = { id: 'p5', repository_id: repo.id, route_path: '/changelog', severity: 'P2_LOW' };
+    
+    [p1, p2, p3, p4, p5].forEach(p => this.monitoredPages.set(p.id, p));
+
+    // Link occurrences to pages
+    [p1, p2, p3, p4, p5].forEach(p => {
+      this.pageOccurrences.add(`${occ1.id}:${p.id}`);
+      this.pageOccurrences.add(`${occ2.id}:${p.id}`);
+    });
+
+    // Seed incidents
+    const inc1: IncidentRecord = {
+      id: 'inc-1',
+      repository_id: repo.id,
+      url_target_id: target1.id,
+      severity: 'P0_CRITICAL',
+      blast_radius_count: 5,
+      remediation_type: 'SITEMAP_MATCH',
+      remediation_suggestion: '/docs/api-v3',
+      remediation_diff: `--- a/components/DocsNav.tsx\n+++ b/components/DocsNav.tsx\n@@ -12,1 +12,1 @@\n- <li><a href="/api/v2">REST API v2 Reference</a></li>\n+ <li><a href="/docs/api-v3">REST API v2 Reference</a></li>`,
+      pull_request_url: 'https://github.com/acme/developer-portal/pull/104',
+      status: 'OPEN',
+      created_at: new Date().toISOString(),
+    };
+    this.incidents.set(inc1.id, inc1);
+
+    const inc2: IncidentRecord = {
+      id: 'inc-2',
+      repository_id: repo.id,
+      url_target_id: target2.id,
+      severity: 'P0_CRITICAL',
+      blast_radius_count: 5,
+      remediation_type: 'WAYBACK_REDIRECT',
+      remediation_suggestion: 'https://web.archive.org/web/20240101000000/https://example-dead-domain-never-exists-987654321.org/spec',
+      remediation_diff: `--- a/components/DocsNav.tsx\n+++ b/components/DocsNav.tsx\n@@ -13,1 +13,1 @@\n- <li><a href="https://example-dead-domain-never-exists-987654321.org/spec">Third-Party Protocol Spec</a></li>\n+ <li><a href="https://web.archive.org/web/20240101000000/https://example-dead-domain-never-exists-987654321.org/spec">Third-Party Protocol Spec (Archived Mirror)</a></li>`,
+      pull_request_url: 'https://github.com/acme/developer-portal/pull/105',
+      status: 'OPEN',
+      created_at: new Date().toISOString(),
+    };
+    this.incidents.set(inc2.id, inc2);
   }
 
   async getRepository(fullName: string): Promise<RepositoryRecord> {

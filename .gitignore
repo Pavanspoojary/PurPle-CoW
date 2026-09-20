@@ -12,6 +12,7 @@ dist/
 build/
 .cache/
 *.log
+supabase/.temp/
 
 # OS files
 .DS_Store
